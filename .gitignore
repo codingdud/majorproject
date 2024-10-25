@@ -1,6 +1,7 @@
 # Virtual environment
 venv/
 env/
+migrations/
 *.venv
 *.virtualenv
 *ca.pem

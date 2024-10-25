@@ -35,7 +35,19 @@ pip install -r requirements.txt
 
 ### Run 
 ` flask --app hello run --debug`
-
+### deployment run 
+```sh
+    gunicorn run:app
+```
+```sh
+    waitress-serve --port=8080 run:app
+```
+### migration command
+```sh
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+```
 ### git help for secrect key 
 git commit --amend
 git reset --soft <comit hash>~1

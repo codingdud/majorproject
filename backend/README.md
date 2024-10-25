@@ -11,7 +11,7 @@ pipenv lock -r
 # how to use!
 
 `C:\> <venv>\Scripts\activate.bat`
-`env\Scripts\activate`
+`venv\Scripts\activate`
 
 # deactivate
 just type `deactivate` in the terimnal
