@@ -3,6 +3,7 @@ venv/
 env/
 *.venv
 *.virtualenv
+*ca.pem
 
 # Python cache files
 __pycache__/
