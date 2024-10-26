@@ -29,6 +29,7 @@ pip install -r requirements.txt
 ### Docker Build
 `Dockerfile | docker build -`
 `docker build -t my-flask-app .`
+`docker build -t flaskappface:demo -f Dockerfile.demo .`
 
 ### Doker run 
 `docker run -p 5000:5000 my-flask-app`
@@ -51,3 +52,10 @@ flask db upgrade
 ### git help for secrect key 
 git commit --amend
 git reset --soft <comit hash>~1
+
+----
+> some importent commend
+```sh
+  pip uninstall package_name
+
+```
