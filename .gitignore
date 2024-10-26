@@ -6,6 +6,7 @@ uploads/
 *.venv
 *.virtualenv
 *ca.pem
+secrets/
 
 # Python cache files
 __pycache__/

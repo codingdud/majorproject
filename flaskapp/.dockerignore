@@ -6,6 +6,7 @@ __pycache__
 .Python
 env/
 venv/
+secrets/
 pip-log.txt
 pip-delete-this-directory.txt
 
@@ -31,7 +32,8 @@ coverage.xml
 .python-version
 
 # dotenv
-#.env
+.env
+ca.pem
 
 # Database
 *.db

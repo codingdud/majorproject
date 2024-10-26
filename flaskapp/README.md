@@ -1,61 +1,108 @@
-# Help Commands  
+# Quick Reference Guide for Python, Docker, and Git
 
-  ---
-pip list  
-pipenv lock -r
+### Python Virtual Environment
+1. **Create a New Virtual Environment:**
+   ```sh
+   python -m venv path/to/myenv
+   ```
+2. **Activate the Virtual Environment:**
+   ```sh
+   # Windows
+   path\to\myenv\Scripts\activate.bat
+   # Unix/macOS
+   source path/to/myenv/bin/activate
+   ```
+3. **Deactivate the Environment:**
+   ```sh
+   deactivate
+   ```
 
-# new venv in python
+### Package Management
+1. **List Installed Packages:**
+   ```sh
+   pip list
+   ```
+2. **Save Packages to `requirements.txt`:**
+   ```sh
+   pip freeze > requirements.txt
+   ```
+3. **Install Packages from `requirements.txt`:**
+   ```sh
+   pip install -r requirements.txt
+   ```
+4. **Pipenv Lock Requirements:**
+   ```sh
+   pipenv lock -r
+   ```
+5. **Uninstall a Package:**
+   ```sh
+   pip uninstall package_name
+   ```
 
-`python -m venv c:\path\to\myenv`
+### Docker Commands
+1. **Build Docker Image:**
+   ```sh
+   docker build -t my-flask-app .
+   docker build -t flaskappface:render -f Dockerfile .
+   ```
+2. **Run Docker Container:**
+   ```sh
+   docker run -p 5000:5000 my-flask-app
+   ```
+3. **Push Docker Image to Repository:**
+   ```sh
+   docker container commit <container-id> flaskapi:latest
+   docker image tag flaskappface:render akanoob/flaskapi:render
+   docker image tag flaskapi:latest akanoob/flaskapi:dev
+   docker push akanoob/flaskapi:render
+   docker push akanoob/flaskapi:dev
+   ```
+   **run docker image of local**
+   ```sh
+   docker run --env-file .env \
+    -v $(pwd)/secrets:/etc/secrets:ro \
+    -p 80:8080 \
+    akanoob/flaskapi:render
+   ```
 
-# how to use!
+### Flask Run Commands
+1. **Local Development Run:**
+   ```sh
+   flask --app hello run --debug
+   ```
+2. **Production Deployment:**
+   ```sh
+   gunicorn run:app
+   waitress-serve --port=8080 run:app
+   ```
 
-`C:\> <venv>\Scripts\activate.bat`
-`venv\Scripts\activate`
+### Database Migrations
+1. **Initialize Migration:**
+   ```sh
+   flask db init
+   ```
+2. **Create New Migration:**
+   ```sh
+   flask db migrate -m "Initial migration"
+   ```
+3. **Apply Migrations:**
+   ```sh
+   flask db upgrade
+   ```
 
-# deactivate
-just type `deactivate` in the terimnal
+### Git Commands
+1. **Modify Last Commit:**
+   ```sh
+   git commit --amend
+   ```
+2. **Soft Reset to a Previous Commit:**
+   ```sh
+   git reset --soft <commit-hash>~1
+   ```
 
-# save pakages
-when you finish your project, just type
-`pip freeze > requirements.txt`
-and then send this file to whoever needs it
+---
 
-# install all requirement
-```sh
-pip install -r requirements.txt
+### Caution
+- **Do not push** development Docker images to public repositories.
+- **Avoid committing secrets** like API keys to Git. Use `.gitignore` or environment variables to manage sensitive data.
 
-```
-### Docker Build
-`Dockerfile | docker build -`
-`docker build -t my-flask-app .`
-`docker build -t flaskappface:demo -f Dockerfile.demo .`
-
-### Doker run 
-`docker run -p 5000:5000 my-flask-app`
-
-### Run 
-` flask --app hello run --debug`
-### deployment run 
-```sh
-    gunicorn run:app
-```
-```sh
-    waitress-serve --port=8080 run:app
-```
-### migration command
-```sh
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
-```
-### git help for secrect key 
-git commit --amend
-git reset --soft <comit hash>~1
-
-----
-> some importent commend
-```sh
-  pip uninstall package_name
-
-```
