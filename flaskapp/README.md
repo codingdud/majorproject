@@ -8,7 +8,7 @@
 2. **Activate the Virtual Environment:**
    ```sh
    # Windows
-   path\to\myenv\Scripts\activate.bat
+   path\to\myenv\Scripts\activate
    # Unix/macOS
    source path/to/myenv/bin/activate
    ```
@@ -43,11 +43,12 @@
 1. **Build Docker Image:**
    ```sh
    docker build -t my-flask-app .
-   docker build -t flaskappface:render -f Dockerfile .
+   docker build -t flaskappface:render -f Dockerfile.render .
    ```
 2. **Run Docker Container:**
    ```sh
    docker run -p 5000:5000 my-flask-app
+   docker run -it --rm -p 8080:8080 538ec5d9e42d /bin/bash 
    ```
 3. **Push Docker Image to Repository:**
    ```sh
@@ -69,6 +70,8 @@
 1. **Local Development Run:**
    ```sh
    flask --app hello run --debug
+   flask --app run run --host 0.0.0.0 --port 8000
+
    ```
 2. **Production Deployment:**
    ```sh
