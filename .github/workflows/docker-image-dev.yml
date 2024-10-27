@@ -25,7 +25,8 @@ jobs:
       run: |
         VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
         echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo $VERSION      
+        echo $VERSION
+        echo env.VERSION      
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
