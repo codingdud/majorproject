@@ -42,12 +42,13 @@
 ### Docker Commands
 1. **Build Docker Image:**
    ```sh
-   docker build -t my-flask-app .
-   docker build -t flaskappface:render -f Dockerfile.render .
+   docker build -t flaskapi:local .
+   docker build -t flaskapi:dev -f Dockerfile.dev .
+   docker build -t flaskapi:render -f Dockerfile.render .
    ```
 2. **Run Docker Container:**
    ```sh
-   docker run -p 5000:5000 my-flask-app
+   docker run -p 5000:5000 flaskapi:local
    docker run -it --rm -p 8080:8080 538ec5d9e42d /bin/bash 
    ```
 3. **Push Docker Image to Repository:**
