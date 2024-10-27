@@ -24,22 +24,8 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create a non-root user
-RUN useradd -m appuser
-
-# Create a directory for certificates and copy ca.pem
-RUN mkdir -p /etc/ssl/certs
-COPY ca.pem /etc/ssl/certs/ca.pem
-
-# Change ownership of the working directory and cert directory
-RUN chown -R appuser:appuser /app /etc/ssl/certs
-
-# Switch to the non-root user
-USER appuser
-
-# Make port 80 available to the world outside this container
-EXPOSE 8080
+EXPOSE 80
 
 # Run gunicorn when the container launches
-CMD ["flask", "--app","run","--host","0.0.0.0","--port","8080"]
+CMD ["gunicorn", "run:app", "-b", "0.0.0.0:80"]
 
