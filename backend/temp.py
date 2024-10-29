@@ -1,6 +1,8 @@
-import os
+import cloudinary
+# Import the cloudinary.api for managing assets
+import cloudinary.api
+# Import the cloudinary.uploader for uploading assets
+import cloudinary.uploader
 
-if not os.path.isfile('shape_predictor_68_face_landmarks.dat'):
-    print("File not found!")
-else:
-    print("File found!")
+result = cloudinary.api.resource_by_asset_id("5a6c6623531728db1713f77cf302f966")
+print(result)

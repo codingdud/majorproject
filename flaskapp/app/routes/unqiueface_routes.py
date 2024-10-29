@@ -8,7 +8,7 @@ unique_face_bp = Blueprint('unique_face', __name__, url_prefix='/unique_faces')
 def get_faces_by_pid(pid):
     try:
         faces = UniqueFace.get_faces_by_pid(pid)
-        faces_data = [{"uid": face.uid, "label": face.label, "image_paths": face.image_paths} for face in faces]
+        faces_data = [{"uid": face.uid, "label": face.label, "urls": face.urls} for face in faces]
         return jsonify(faces_data)
     except Exception as e:
         print(e)

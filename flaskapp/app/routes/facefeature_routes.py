@@ -6,6 +6,9 @@ from app.services.face_recognition import FaceRecognitionService
 from app.models.face_feature import FaceFeature
 from app.models.unique_face import UniqueFace
 from app.database import db
+from app.utils.cloudinary import CloudinaryUtil
+from cloudinary import  exceptions
+
 import asyncio
 
 # Define the blueprint for face feature routes
@@ -17,7 +20,7 @@ async def create_face_feature(pid):
     # Check for 'images' in request files
     if 'images' not in request.files:
         return jsonify({'error': 'Missing image'}), 400
-
+    cloud = CloudinaryUtil()
     face_service = FaceRecognitionService()
     files = request.files.getlist('images')  # Retrieve all uploaded files
     if not files:
@@ -26,25 +29,27 @@ async def create_face_feature(pid):
         return jsonify({'error': 'pid missing'}), 400    
 
     saved_file_paths = []
-    
+    created_face_features=[]
     # Save each uploaded file
     for file in files:
         filename = secure_filename(file.filename)
         if filename == '':
             return jsonify({'error': 'Empty filename'}), 400
-
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        os.makedirs(current_app.config['UPLOAD_FOLDER'], exist_ok=True)  # Ensure folder exists
-        file.save(filepath)
-        saved_file_paths.append(filepath)
-
-    # Extract features for each saved image and create FaceFeature entries
-    created_face_features = []
-    for path in saved_file_paths:
-        features = face_service.process_image(path)
-        if features is not None:
-            face_feature = FaceFeature.create_face_feature(features=features, image_paths=path, pid=pid)
-            created_face_features.append(face_feature)
+        if cloud:
+            result=cloud.upload_image(file)
+            print(result)
+            features = face_service.process_image2(file)
+            if features is not None:
+                face_feature=FaceFeature.create_face_feature(features, result["asset_id"], result["url"], pid)
+                created_face_features.append(face_feature)
+        else:
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            os.makedirs(current_app.config['UPLOAD_FOLDER'], exist_ok=True)  # Ensure folder exists
+            file.save(filepath)
+            features = face_service.process_image(path)
+            if features is not None:
+                face_feature = FaceFeature.create_face_feature(features=features, asset_id=0, url=filepath, pid=pid)
+                created_face_features.append(face_feature)
             
     # Asynchronously call the function to insert unique faces
     await asyncio.to_thread(UniqueFace.insert_unique_face, created_face_features, pid)
@@ -56,7 +61,8 @@ async def create_face_feature(pid):
         response_data.append({
             'id': face_feature.id,
             'features': features_array.tolist()[0],
-            'image_paths': face_feature.image_paths,
+            'asset_id': face_feature.asset_id,
+            'url': face_feature.url,
             'created_at': face_feature.created_at.isoformat(),
             'pid': face_feature.pid
         })
@@ -72,12 +78,13 @@ def get_face_feature(id):
 
     features_array = np.frombuffer(face_feature.features, dtype=np.float64)
     return jsonify({
-        'id': face_feature.id,
-        'features': features_array.tolist()[0],
-        'image_paths': face_feature.image_paths,
-        'created_at': face_feature.created_at.isoformat(),
-        'pid': face_feature.pid
-    }), 200
+            'id': face_feature.id,
+            'features': features_array.tolist()[0],
+            'asset_id': face_feature.asset_id,
+            'url': face_feature.url,
+            'created_at': face_feature.created_at.isoformat(),
+            'pid': face_feature.pid
+        }), 200
 
 # Route to retrieve all face features by a specific PID
 @facefeature_bp.route("/pid/<int:pid>", methods=['GET'])
@@ -93,7 +100,8 @@ def get_face_features_by_pid(pid):
         response_data.append({
             'id': face_feature.id,
             'features': features_array.tolist()[0],
-            'image_paths': face_feature.image_paths,
+            'asset_id': face_feature.asset_id,
+            'url': face_feature.url,
             'created_at': face_feature.created_at.isoformat(),
             'pid': face_feature.pid
         })
@@ -147,15 +155,26 @@ def facefinder(pid):
 
     # Process the image to extract face features
     features = face_service.process_image2(file)
-    
+
     if features is None:
         return jsonify({'message': 'No faces found in image'}), 404
 
     # Find matching images for the extracted features
+    response_data=[]
     matching_images = FaceFeature.find_matches(features, pid)
-
+    # matching_images_list = [image.to_dict() for image in matching_images]
+    for face_feature in matching_images:
+        features_array = np.frombuffer(face_feature.features, dtype=np.float64)
+        response_data.append({
+            'id': face_feature.id,
+            'features': features_array.tolist()[0],
+            'asset_id': face_feature.asset_id,
+            'url': face_feature.url,
+            'created_at': face_feature.created_at.isoformat(),
+            'pid': face_feature.pid
+        })
     if matching_images:
-        return jsonify({'matching_images': matching_images}), 200
+        return jsonify({'matching_images': response_data}), 200
     else:
         return jsonify({'message': 'No matching images found'}), 404
 
@@ -172,18 +191,40 @@ def get_uploaded_file(filename):
 
 @facefeature_bp.route('/listimages', methods=['GET'])
 def list_uploaded_files():
-    """List all files in the UPLOAD_FOLDER directory."""
+    """List all images uploaded to Cloudinary with pagination."""
+    cloud = CloudinaryUtil()
     upload_folder = current_app.config.get('UPLOAD_FOLDER')
-    
-    try:
-        # Ensure the directory exists and list all files
-        files = os.listdir(upload_folder)
-        # Filter out directories, only include files
-        file_list = [file for file in files if os.path.isfile(os.path.join(upload_folder, file))]
-        
-        return jsonify({'files': file_list}), 200
-    
-    except FileNotFoundError:
-        # Return an error if the folder does not exist
-        return jsonify({'error': 'Upload folder not found'}), 404
 
+    # Get pagination parameters from query string, with default values
+    page = request.args.get('page', default=1, type=int)
+    page_size = request.args.get('page_size', default=10, type=int)
+    next_cursor = request.args.get('next_cursor')
+
+    try:
+        # Fetch resources from Cloudinary using the CloudinaryUtil class
+        if cloud:
+            resources_data = cloud.list_resources(page=page, page_size=page_size,next_cursor=next_cursor)
+
+            if 'error' in resources_data:
+                # Handle errors from Cloudinary
+                return jsonify({'error': resources_data['error']}), 500
+
+            # Extract file list and pagination info
+            file_list = resources_data['files']
+            pagination_info = resources_data['pagination']
+
+            return jsonify({
+                'files': file_list,
+                'pagination': pagination_info
+            }), 200
+
+        else:
+            # Fallback to listing files from the local upload folder
+            files = os.listdir(upload_folder)
+            # Filter out directories, only include files
+            file_list = [file for file in files if os.path.isfile(os.path.join(upload_folder, file))]
+            return jsonify({'files': file_list}), 200
+
+    except Exception as e:
+        # Handle any unexpected exceptions
+        return jsonify({'error': 'An unexpected error occurred: ' + str(e)}), 500

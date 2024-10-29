@@ -7,7 +7,8 @@ class FaceFeature(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     features = db.Column(db.LargeBinary)
-    image_paths = db.Column(db.Text)
+    asset_id = db.Column(db.String, nullable=False)  # New field for Cloudinary asset ID
+    url = db.Column(db.String, nullable=False)       # New field for Cloudinary URL
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     pid = db.Column(db.Integer, db.ForeignKey('projects.pid'), nullable=True)
 
@@ -28,14 +29,14 @@ class FaceFeature(db.Model):
             db_features = np.frombuffer(face.features, dtype=np.float64)
             distance = np.linalg.norm(features_array - db_features)
             if distance < tolerance:
-                matches.extend(face.image_paths.split(','))
+                matches.append(face)  # Use URL instead of image paths
 
         return list(set(matches))
 
     # Create a new face feature
     @staticmethod
-    def create_face_feature(features, image_paths, pid):
-        new_face_feature = FaceFeature(features=features, image_paths=image_paths, pid=pid)
+    def create_face_feature(features, asset_id, url, pid):
+        new_face_feature = FaceFeature(features=features, asset_id=asset_id, url=url, pid=pid)
         db.session.add(new_face_feature)
         db.session.commit()
         return new_face_feature
@@ -52,26 +53,30 @@ class FaceFeature(db.Model):
 
     # Update a face feature
     @staticmethod
-    def update_face_feature(face_feature_id, features=None, image_paths=None):
+    def update_face_feature(face_feature_id, features=None, asset_id=None, url=None):
         face_feature = FaceFeature.query.get(face_feature_id)
         if face_feature:
             if features is not None:
                 face_feature.features = features
-            if image_paths is not None:
-                face_feature.image_paths = image_paths
+            if asset_id is not None:
+                face_feature.asset_id = asset_id
+            if url is not None:
+                face_feature.url = url
             db.session.commit()
             return face_feature
         return None
 
     # Delete a face feature
     @staticmethod
-    def delete_face_feature(id):
-        face_feature = FaceFeature.query.get(id)
+    def delete_face_feature(face_feature_id):
+        face_feature = FaceFeature.query.get(face_feature_id)
         if face_feature:
             db.session.delete(face_feature)
             db.session.commit()
             return True
         return False
 
+    # Get face features by project ID
+    @staticmethod
     def get_face_features_by_pid(pid):
         return FaceFeature.query.filter_by(pid=pid).all()
