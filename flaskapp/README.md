@@ -9,6 +9,7 @@
    ```sh
    # Windows
    path\to\myenv\Scripts\activate
+   venv\Scripts\activate
    # Unix/macOS
    source path/to/myenv/bin/activate
    ```
