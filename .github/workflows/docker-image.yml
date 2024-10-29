@@ -33,6 +33,3 @@ jobs:
     - name: Trigger Render Deployment
       run: |
         curl -X POST "https://api.render.com/deploy/srv-csefpd5svqrc73f2n7u0?key=${{ secrets.RENDER_API_KEY }}"
-        echo "TAG=$(git describe --tags --always)" >> $GITHUB_ENV
-        echo $TAG
-        echo ${{ env.TAG }}
