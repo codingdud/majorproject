@@ -128,3 +128,4 @@ class User(db.Model):
             db.session.rollback()
             print(f"Error deleting user: {e}")
             return False
+

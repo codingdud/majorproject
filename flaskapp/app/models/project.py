@@ -7,6 +7,7 @@ class Project(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     p_name = db.Column(db.String(255), nullable=False)
     thumb_nail = db.Column(db.Text, default='uploads/placeholder.png')
+
     
     face_features = db.relationship('FaceFeature', backref='project', lazy=True)
     unique_faces = db.relationship('UniqueFace', backref='project', lazy=True)
