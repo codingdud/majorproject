@@ -68,8 +68,8 @@ class FaceFeature(db.Model):
 
     # Delete a face feature
     @staticmethod
-    def delete_face_feature(face_feature_id):
-        face_feature = FaceFeature.query.get(face_feature_id)
+    def delete_face_feature(id):
+        face_feature = FaceFeature.query.get(id)
         if face_feature:
             db.session.delete(face_feature)
             db.session.commit()
