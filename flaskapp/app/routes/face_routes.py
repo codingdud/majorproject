@@ -1,10 +1,15 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, render_template
 from app.services.face_recognition import FaceRecognitionService
 from app.models.face import Face
 from werkzeug.utils import secure_filename
 import os
 
-face_bp = Blueprint('face', __name__)
+face_bp = Blueprint('api', __name__)
+
+@face_bp.route('/', methods=['GET'])
+def api_documentation():
+    print(current_app.template_folder)
+    return render_template('api.html')
 
 @face_bp.route('/ok', methods=['GET'])
 def index():
