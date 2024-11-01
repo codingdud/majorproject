@@ -102,7 +102,8 @@
    ```
 2. **Soft Reset to a Previous Commit:**
    ```sh
-   git reset --soft <commit-hash>~1
+   git reset --soft <commit-hash>~
+   git reset --merge previous-commit
    ```
 
 ---
