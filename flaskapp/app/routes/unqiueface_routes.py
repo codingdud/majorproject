@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, abort
 from app.database import db
-from .models import UniqueFace  # Make sure the model import path is correct
+from app.models.unique_face import UniqueFace 
 
 unique_face_bp = Blueprint('unique_face', __name__, url_prefix='/unique_faces')
 

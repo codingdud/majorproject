@@ -5,6 +5,7 @@ from app.routes.face_routes import face_bp
 from app.routes.auth_routes import user_bp
 from app.routes.project_routes import project_bp
 from app.routes.facefeature_routes import facefeature_bp
+from app.routes.unqiueface_routes import unique_face_bp
 
 
 from app.utils.db_migration import DBMigrationUtil
@@ -17,6 +18,7 @@ def create_app():
     
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['FIND_FOLDER'], exist_ok=True)
     
     # Initialize extensions
     db.init_app(app)
@@ -27,6 +29,8 @@ def create_app():
     app.register_blueprint(user_bp, url_prefix='/auth')
     app.register_blueprint(project_bp, url_prefix='/project')
     app.register_blueprint(facefeature_bp, url_prefix='/facefeature')
+    app.register_blueprint(unique_face_bp, url_prefix='/unique_faces')
+
 
     
     with app.app_context():

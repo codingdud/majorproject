@@ -30,3 +30,27 @@ class FaceRecognitionService:
 
         # Return features for the first detected face
         return self.get_face_features(image, faces[0])
+
+    def process_image2(self, file):
+        """
+        Process an image file to extract facial features.
+        """
+        # Reset the file pointer to the beginning
+        file.seek(0)
+        # Read the file directly into a NumPy array
+        file_data = np.frombuffer(file.read(), np.uint8)
+        # Decode the image from memory
+        image = cv2.imdecode(file_data, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            return None
+
+        # Convert to grayscale if needed
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        faces = self.detector(gray)
+
+        if len(faces) == 0:
+            return None
+
+        # Return features for the first detected face
+        return self.get_face_features(image, faces[0])
