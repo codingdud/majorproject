@@ -15,11 +15,13 @@ facefeature_bp = Blueprint('facefeature', __name__)
 @facefeature_bp.route("/imagesupload/<int:pid>", methods=['POST'])
 async def create_face_feature(pid):
     # Check for 'images' in request files
+
     if 'images' not in request.files:
         return jsonify({'error': 'Missing image'}), 400
 
     face_service = FaceRecognitionService()
     files = request.files.getlist('images')  # Retrieve all uploaded files
+
     if not files:
         return jsonify({'error': 'No files uploaded'}), 400
     if not pid:
@@ -45,7 +47,7 @@ async def create_face_feature(pid):
         if features is not None:
             face_feature = FaceFeature.create_face_feature(features=features, image_paths=path, pid=pid)
             created_face_features.append(face_feature)
-            
+
     # Asynchronously call the function to insert unique faces
     await asyncio.to_thread(UniqueFace.insert_unique_face, created_face_features, pid)
 
@@ -62,6 +64,7 @@ async def create_face_feature(pid):
         })
 
     return jsonify({'message': 'Face features created', 'files': response_data}), 201
+
 
 # Route to retrieve a single face feature by its ID
 @facefeature_bp.route("/<int:id>", methods=['GET'])

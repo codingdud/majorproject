@@ -7,6 +7,7 @@ from app.routes.project_routes import project_bp
 from app.routes.facefeature_routes import facefeature_bp
 from app.routes.unqiueface_routes import unique_face_bp
 
+
 from app.utils.db_migration import DBMigrationUtil
 from flask_migrate import Migrate
 import os
@@ -29,6 +30,7 @@ def create_app():
     app.register_blueprint(project_bp, url_prefix='/project')
     app.register_blueprint(facefeature_bp, url_prefix='/facefeature')
     app.register_blueprint(unique_face_bp, url_prefix='/unique_faces')
+
 
     
     with app.app_context():
