@@ -6,7 +6,8 @@ class UniqueFace(db.Model):
 
     uid = db.Column(db.Integer, primary_key=True)
     features = db.Column(db.LargeBinary)  # Binary data for face features
-    image_paths = db.Column(db.ARRAY(db.Text))  # Array of image paths
+    asset_ids = db.Column(db.ARRAY(db.String))  # Array of Cloudinary asset IDs
+    urls = db.Column(db.ARRAY(db.String))       # Array of Cloudinary URLs
     pid = db.Column(db.Integer, db.ForeignKey('projects.pid'), nullable=True)  # Foreign key to Projects table
     label = db.Column(db.String(100), default="name")  # Label for the unique face
 
@@ -30,16 +31,16 @@ class UniqueFace(db.Model):
                 distance = np.linalg.norm(features_array - db_features)
 
                 if distance < tolerance:
-                    # If a match is found, update the image paths
-                    existing_paths = unique_face.image_paths  # Get the existing image paths
+                    # If a match is found, update the asset_ids and urls
+                    existing_asset_ids = unique_face.asset_ids or []  # Get existing asset IDs
+                    existing_urls = unique_face.urls or []           # Get existing URLs
 
-                    # Ensure image_paths is a list if it's not already
-                    if isinstance(existing_paths, list):
-                        existing_paths.append(face_feature.image_paths)  # Append new image path
-                    else:
-                        existing_paths = [existing_paths, face_feature.image_paths]  # Create list if necessary
+                    # Append the new asset ID and URL
+                    existing_asset_ids.append(face_feature.asset_id)  # Assuming face_feature has asset_id
+                    existing_urls.append(face_feature.url)            # Assuming face_feature has url
                     
-                    unique_face.image_paths = existing_paths  # Update the unique_face with the new list
+                    unique_face.asset_ids = existing_asset_ids  # Update the unique_face with the new list
+                    unique_face.urls = existing_urls
                     is_matched = True
                     continue  # Continue to the next face feature
 
@@ -47,7 +48,8 @@ class UniqueFace(db.Model):
                 # If no match was found, create a new UniqueFace entry
                 new_unique_face = cls(
                     features=features,
-                    image_paths=[face_feature.image_paths],  # Store as a list
+                    asset_ids=[face_feature.asset_id],  # Store as a list
+                    urls=[face_feature.url],             # Store as a list
                     pid=pid
                 )
                 db.session.add(new_unique_face)
