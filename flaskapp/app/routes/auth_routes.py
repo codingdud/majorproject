@@ -80,7 +80,18 @@ def update_user():
 def deactivate_user():
     user = request.user
 
-    if User.delete_user(user.user_id):
+    if User.deactivate_user(user.user_id):
         return jsonify({'message': 'User account deactivated successfully'}), 200
+    else:
+        return jsonify({'error': 'Error deactivating user'}), 500
+
+#DELETE user by Id
+@user_bp.route('/permanentdelete', methods=['DELETE'])
+@authorize
+def delete_user():
+    user = request.user
+
+    if User.delete_user(user.user_id):
+        return jsonify({'message': 'User account deleted successfully'}), 200
     else:
         return jsonify({'error': 'Error deactivating user'}), 500

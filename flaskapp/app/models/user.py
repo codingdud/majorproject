@@ -66,11 +66,15 @@ class User(db.Model):
             if user:
                 # Optionally check if email already exists
                 if  email:
+                    # Check if the email already exists for another user
+                    existing_user = cls.query.filter(cls.email == email, cls.user_id != user_id).first()
+                    if existing_user:
+                        return False, "Email already in use by another user"
                     user.email = email
                 if password:
                     user.password = generate_password_hash(password)  # Hash the new password
                 if delete_at:
-                    user.delete_at = delete_at
+                    user.delete_at = datetime.utcnow()
 
             db.session.commit()
             return True
@@ -79,9 +83,9 @@ class User(db.Model):
             print(f"Error updating user: {e}")
             return None
 
-    # DELETE user by ID
+    # deactivate user by ID
     @classmethod
-    def delete_user(cls, user_id):
+    def deactivate_user(cls, user_id):
         user = cls.query.get(user_id)
         if not user:
             return False
@@ -105,3 +109,22 @@ class User(db.Model):
         else:
             users = query.all()
         return users
+    
+    @classmethod
+    def delete_user(cls, user_id):
+        """
+        Permanently delete a user by ID.
+        """
+        user = cls.query.get(user_id)
+        if not user:
+            return False
+
+        try:
+            # Permanently delete the user from the database
+            db.session.delete(user)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error deleting user: {e}")
+            return False

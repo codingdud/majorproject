@@ -3,7 +3,7 @@
 ### Python Virtual Environment
 1. **Create a New Virtual Environment:**
    ```sh
-   python -m venv path/to/myenv
+   python -m venv venv
    ```
 2. **Activate the Virtual Environment:**
    ```sh

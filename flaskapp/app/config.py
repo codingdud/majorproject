@@ -25,6 +25,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key')
     
     # Face Recognition Configuration
+    FIND_FOLDER = os.getenv('FIND_FOLDER', 'find')
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
     DLIB_SHAPE_PREDICTOR = 'shape_predictor_68_face_landmarks.dat'
     DLIB_FACE_RECOGNITION = 'dlib_face_recognition_resnet_model_v1.dat'
