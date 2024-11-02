@@ -105,7 +105,7 @@
    git reset --soft <commit-hash>~
    git reset --merge previous-commit
    ```
-
+   ```gunicorn --certfile=server.crt --keyfile=server.key --bind 0.0.0.0:443 test:app```
 ---
 
 ### Caution
