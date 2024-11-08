@@ -35,7 +35,7 @@ class CloudinaryUtil:
                 max_results=page_size,
                 next_cursor=next_cursor
             )
-            print(resources)
+            #print(resources)
             # Extract necessary information
             file_list = [{'public_id': res['public_id'], 'url': res['secure_url']} for res in resources['resources']]
             
