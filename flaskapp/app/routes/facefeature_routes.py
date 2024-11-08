@@ -37,7 +37,7 @@ async def create_face_feature(pid):
             return jsonify({'error': 'Empty filename'}), 400
         if cloud:
             result=cloud.upload_image(file)
-            print(result)
+            #print(result)
             features = face_service.process_image2(file)
             if features is not None:
                 face_feature=FaceFeature.create_face_feature(features, result["asset_id"], result["url"], pid)
@@ -51,8 +51,6 @@ async def create_face_feature(pid):
                 face_feature = FaceFeature.create_face_feature(features=features, asset_id=0, url=filepath, pid=pid)
                 created_face_features.append(face_feature)
             
-    # Asynchronously call the function to insert unique faces
-    await asyncio.to_thread(UniqueFace.insert_unique_face, created_face_features, pid)
 
     # Prepare response data
     response_data = []
@@ -67,6 +65,9 @@ async def create_face_feature(pid):
             'pid': face_feature.pid
         })
 
+    # Asynchronously call the function to insert unique faces
+    await asyncio.to_thread(UniqueFace.insert_unique_face, created_face_features, pid)
+    
     return jsonify({'message': 'Face features created', 'files': response_data}), 201
 
 # Route to retrieve a single face feature by its ID
