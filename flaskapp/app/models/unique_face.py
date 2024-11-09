@@ -75,7 +75,7 @@ class UniqueFace(db.Model):
                         array.append(new_unique_face)
                         db.session.add(new_unique_face)
                         db.session.flush()
-                        print(f"Added new unique face with asset: {face_feature.uid}")
+                        print(f"Added new unique face with asset: {face_feature.id}")
                         
                     except Exception as e:
                         print(f"Error creating new face: {e}")
