@@ -17,7 +17,7 @@ class CloudinaryUtil:
         """Uploads a file-like object directly to Cloudinary and returns asset_id and URL."""
         try:
             result = cloudinary.uploader.upload(file)
-            print(result)
+            # print(result)
             # Extract asset_id and URL
             asset_id = result.get("asset_id")
             url = result.get("url")
